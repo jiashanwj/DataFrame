@@ -24,13 +24,11 @@ result2 = df.groupby(['car_model'])['id'].agg(['count'])
 print('车型投诉总数：')
 print(result2)
 
-# 品牌平均车型投诉（降序）
-# result3 = result1.merge(df.groupby(['brand'])['car'].agg(['count'])
-# result3 = df.groupby(['brand']).agg({'id':['count'], 'car_model':['count']})
-# print(result3)
-# result3 = df.groupby(['brand', 'car_model'])['id'].agg(['count'])
-# result3 = result3.groupby(['brand'])['car_model'].agg(['count'])
-# print(result3)
-
-
-
+# 品牌平均车型投诉（降序）: 品牌投诉总数/车型数量 = 品牌平均车型投诉
+temp = df.drop_duplicates(subset='car_model')
+temp = temp.groupby(['brand'])['car_model'].agg(['count'])
+result3 = pd.merge(left=result1, right=temp, left_on='brand', right_on='brand', how='outer')
+result3['品牌平均车型投诉'] = result3['count_x'] / result3['count_y']
+result3 = result3.sort_values('品牌平均车型投诉', ascending=False)
+print('品牌平均车型投诉最多的为：')
+print(result3.head(1))
